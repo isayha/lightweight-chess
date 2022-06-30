@@ -8,11 +8,11 @@ typedef struct coords {
     int col;
 } coords;
 
-const coords nullCoords = {-1, -1};
+static const coords nullCoords = {-1, -1};
 
 typedef struct coordsNode {
     coords data;
-    coordsNode *nextNode;
+    struct coordsNode *nextNode;
 } coordsNode;
 
 coordsNode * createNewNode(coords);

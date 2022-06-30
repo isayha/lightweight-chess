@@ -16,15 +16,22 @@ enum chessPiece {
 };
 
 enum turn {
-    whiteTurn,
-    blackTurn
+    blackTurn = -1,
+    whiteTurn = 1
 };
 
-char pieceStrs[13][3] = {
+static const char pieceStrs[13][3] = {
     {'X', 'X', '\0'},
-    {'W', 'P', '\0'}, {'W', 'K', '\0'}, {'W', 'B', '\0'}, {'W', 'R', '\0'}, {'W', 'Q', '\0'}, {'W', 'K', '\0'},
-    {'B', 'P', '\0'}, {'B', 'K', '\0'}, {'B', 'B', '\0'}, {'B', 'R', '\0'}, {'B', 'Q', '\0'}, {'B', 'K', '\0'}
+    {'W', 'P', '\0'}, {'W', 'N', '\0'}, {'W', 'B', '\0'}, {'W', 'R', '\0'}, {'W', 'Q', '\0'}, {'W', 'K', '\0'},
+    {'B', 'P', '\0'}, {'B', 'N', '\0'}, {'B', 'B', '\0'}, {'B', 'R', '\0'}, {'B', 'Q', '\0'}, {'B', 'K', '\0'}
 };
+
+// Using the Unicode chess pieces will require some tomfoolery
+// static char pieceStrsAdv[13][2] = {
+//     "☐",
+//     "♙", "♘", "♗", "♖", "♕", "♔",
+//     "♟" , "♞", "♝", "♜", "♛", "♚"
+// };
 
 chessBoard getNewChessBoard();
 void printChessBoard(chessBoard, int);
