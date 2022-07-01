@@ -73,6 +73,56 @@ coords * getMoves(chessBoard board, coords pieceCoords) {
             }
         break;
         case whiteKnight: case blackKnight:
+        
+        break;
+        case whiteBishop: case blackBishop:
+
+        break;
+        case whiteRook: case blackRook:
+            for (int newRow = pieceCoords.row; (newRow < 8); newRow++) {
+                int otherPiece = board.spaces[newRow][pieceCoords.col];
+                if (otherPiece != 0) {
+                    if (piece / 7 != otherPiece / 7) {
+
+                    }
+                    else {
+
+                    }
+                }
+            }
+            for (int newRow = pieceCoords.row; (newRow >= 0); newRow--) {
+                int otherPiece = board.spaces[newRow][pieceCoords.col];
+                if (otherPiece != 0) {
+                    if (piece / 7 != otherPiece / 7) {
+
+                    }
+                    else {
+                        
+                    }
+                }
+            }
+            for (int newCol = pieceCoords.col; (newCol < 8); newCol++) {
+                int otherPiece = board.spaces[pieceCoords.row][newCol];
+                if (otherPiece != 0) {
+                    if (piece / 7 != otherPiece / 7) {
+
+                    }
+                    else {
+                        
+                    }
+                }
+            }
+            for (int newCol = pieceCoords.col; (newCol >= 0); newCol--) {
+                int otherPiece = board.spaces[pieceCoords.row][newCol];
+                if (otherPiece != 0) {
+                    if (piece / 7 != otherPiece / 7) {
+
+                    }
+                    else {
+                        
+                    }
+                }
+            }
         break;
         default:
         break;
