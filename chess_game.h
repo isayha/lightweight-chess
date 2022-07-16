@@ -26,6 +26,17 @@ static const char pieceStrs[13][3] = {
     {'B', 'P', '\0'}, {'B', 'N', '\0'}, {'B', 'B', '\0'}, {'B', 'R', '\0'}, {'B', 'Q', '\0'}, {'B', 'K', '\0'}
 };
 
+static const int knightMoves[8][2] = {
+    {-2, -1},
+    {-2, 1},
+    {-1, -2},
+    {-1, 2},
+    {1, -2},
+    {1, 2},
+    {2, -1},
+    {2, 1}
+};
+
 // Using the Unicode chess pieces will require some tomfoolery
 // static char pieceStrsAdv[13][2] = {
 //     "☐",

@@ -89,6 +89,20 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
                 }
             }
         break;
+        case whiteKnight: case blackKnight:
+            for (int i = 0; i < 8; i++) {
+                int newRow = row + knightMoves[i][0];
+                int newCol = col + knightMoves[i][1];
+                if ((newRow >= 0 && newRow < 8) && (newCol >= 0 && newCol < 8)) {
+                    int otherPiece = board.spaces[newRow][newCol];
+                    if (otherPiece == 0 || (piece / 7 != otherPiece / 7)) {
+                        coords move = {newRow, newCol};
+                        coordsNode* newNode = createNewNode(move);
+                        currentNode->nextNode = newNode;
+                        currentNode = newNode;
+                    }
+                }
+            }
         default:
         break;
     }

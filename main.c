@@ -16,4 +16,18 @@ void main(int argc, char *argv[]) {
     headNode = getMoves(board, testCoords);
     printAllNodes(headNode);
     freeAllNodes(headNode);
+
+    printf("\n");
+
+    testCoords.row = 0; testCoords.col = 1;
+    headNode = getMoves(board, testCoords);
+    printAllNodes(headNode);
+    freeAllNodes(headNode);
+
+    printf("\n");
+
+    testCoords.row = 7; testCoords.col = 6;
+    headNode = getMoves(board, testCoords);
+    printAllNodes(headNode);
+    freeAllNodes(headNode);
 }
