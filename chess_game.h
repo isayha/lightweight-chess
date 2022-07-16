@@ -35,6 +35,6 @@ static const char pieceStrs[13][3] = {
 
 chessBoard getNewChessBoard();
 void printChessBoard(chessBoard, int);
-coords * getMoves(chessBoard, coords);
+coordsNode* getMoves(chessBoard, coords);
 
 #endif

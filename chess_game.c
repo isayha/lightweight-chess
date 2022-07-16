@@ -32,14 +32,16 @@ void printChessBoard(chessBoard board, int turn) {
     printf("\n");
 }
 
-coords * getMoves(chessBoard board, coords pieceCoords) {
-    int piece = board.spaces[pieceCoords.row][pieceCoords.col];
+coordsNode* getMoves(chessBoard board, coords pieceCoords) {
+    coordsNode* headNode = createNewNode(pieceCoords);
+    coordsNode* currentNode = headNode;
+    int row = pieceCoords.row;
+    int col = pieceCoords.col;
+    int piece = board.spaces[row][col];
 
     if (piece == none) {
-        
+        return headNode;
     }
-
-    coords *moves = NULL;
 
     int turn;
     if (piece > 6) {
@@ -52,79 +54,43 @@ coords * getMoves(chessBoard board, coords pieceCoords) {
     switch (piece) {
         case whitePawn: case blackPawn:
             // Capture Check (excl. en passant)
-            if (pieceCoords.col > 0) {
-                int otherPiece = board.spaces[pieceCoords.row + (1 * turn)][pieceCoords.col - 1];
+            if (col > 0) {
+                // Diagonal Check (Left relative to White)
+                int otherPiece = board.spaces[row + (1 * turn)][col - 1];
                 if (otherPiece != 0 && (piece / 7 != otherPiece / 7)) {
-                    
+                    coords move = {row + (1 * turn), col - 1};
+                    coordsNode* newNode = createNewNode(move);
+                    currentNode->nextNode = newNode;
+                    currentNode = newNode;
                 }
             }
-            if (pieceCoords.col < 7) {
-                int otherPiece = board.spaces[pieceCoords.row + (1 * turn)][pieceCoords.col + 1];
+            if (col < 7) {
+                // Diagonal Check (Right relative to White)
+                int otherPiece = board.spaces[row + (1 * turn)][col + 1];
                 if (otherPiece != 0 && (piece / 7 != otherPiece / 7)) {
-                    
+                    coords move = {row + (1 * turn), col + 1};
+                    coordsNode* newNode = createNewNode(move);
+                    currentNode->nextNode = newNode;
+                    currentNode = newNode;
                 }
             }
             // Forward Check
-            if (board.spaces[pieceCoords.row + (1 * turn)] == none) {
+            if (board.spaces[row + (1 * turn)][col] == none) {
+                coords move = {row + (1 * turn), col};
+                coordsNode* newNode = createNewNode(move);
+                currentNode->nextNode = newNode;
+                currentNode = newNode;
                 // Double Forward Check
-                if (pieceCoords.row == (1 + (5 * (piece / 7))) && board.spaces[pieceCoords.row + (2 * turn)] == none) {
-                    
-                }
-            }
-        break;
-        case whiteKnight: case blackKnight:
-        
-        break;
-        case whiteBishop: case blackBishop:
-
-        break;
-        case whiteRook: case blackRook:
-            for (int newRow = pieceCoords.row; (newRow < 8); newRow++) {
-                int otherPiece = board.spaces[newRow][pieceCoords.col];
-                if (otherPiece != 0) {
-                    if (piece / 7 != otherPiece / 7) {
-
-                    }
-                    else {
-
-                    }
-                }
-            }
-            for (int newRow = pieceCoords.row; (newRow >= 0); newRow--) {
-                int otherPiece = board.spaces[newRow][pieceCoords.col];
-                if (otherPiece != 0) {
-                    if (piece / 7 != otherPiece / 7) {
-
-                    }
-                    else {
-                        
-                    }
-                }
-            }
-            for (int newCol = pieceCoords.col; (newCol < 8); newCol++) {
-                int otherPiece = board.spaces[pieceCoords.row][newCol];
-                if (otherPiece != 0) {
-                    if (piece / 7 != otherPiece / 7) {
-
-                    }
-                    else {
-                        
-                    }
-                }
-            }
-            for (int newCol = pieceCoords.col; (newCol >= 0); newCol--) {
-                int otherPiece = board.spaces[pieceCoords.row][newCol];
-                if (otherPiece != 0) {
-                    if (piece / 7 != otherPiece / 7) {
-
-                    }
-                    else {
-                        
-                    }
+                if (row == (1 + (5 * (piece / 7))) && board.spaces[row + (2 * turn)][col] == none) {
+                    coords move = {row + (2 * turn), col};
+                    coordsNode* newNode = createNewNode(move);
+                    currentNode->nextNode = newNode;
+                    currentNode = newNode;
                 }
             }
         break;
         default:
         break;
     }
+    return headNode;
 }
