@@ -37,6 +37,19 @@ static const int knightMoves[8][2] = {
     {2, 1}
 };
 
+static const int dirs[8][2] = {
+    //BISHOP
+    {1, 1},
+    {1, -1},
+    {-1, 1},
+    {-1, -1},
+    //ROOK
+    {0, -1},
+    {-1, 0},
+    {0, 1},
+    {1, 0}
+};
+
 // Using the Unicode chess pieces will require some tomfoolery
 // static char pieceStrsAdv[13][2] = {
 //     "☐",

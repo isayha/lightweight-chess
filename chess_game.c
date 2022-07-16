@@ -29,7 +29,6 @@ void printChessBoard(chessBoard board, int turn) {
         }
         printf("\n");
     }
-    printf("\n");
 }
 
 coordsNode* getMoves(chessBoard board, coords pieceCoords) {
@@ -103,6 +102,51 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
                     }
                 }
             }
+        break;
+        case whiteBishop: case blackBishop:
+        case whiteRook: case blackRook:
+        case whiteQueen: case blackQueen:
+        case whiteKing: case blackKing:
+            int i_start;
+            int i_end;
+
+            if (piece != whiteRook && piece != blackRook) {
+                i_start = 0;
+            }
+            else {
+                i_start = 4;
+            }
+
+            if (piece != whiteBishop && piece != blackBishop) {
+                i_end = 8;
+            }
+            else {
+                i_end = 4;
+            }
+
+            for (int i = i_start; i < i_end; i++) {
+                int newRow = row + dirs[i][0];
+                int newCol = col + dirs[i][1];
+                int endFlag = 0;
+                while (!endFlag && (newRow >= 0 && newRow < 8) && (newCol >= 0 && newCol < 8)) {
+                    int otherPiece = board.spaces[newRow][newCol];
+                    if (otherPiece == 0 || (piece / 7 != otherPiece / 7)) {
+                        coords move = {newRow, newCol};
+                        coordsNode* newNode = createNewNode(move);
+                        currentNode->nextNode = newNode;
+                        currentNode = newNode;
+                        if (otherPiece != 0) {
+                            endFlag = 1;
+                        }
+                    }
+                    else {
+                        endFlag = 1;
+                    }
+                    newRow += dirs[i][0];
+                    newCol += dirs[i][1];
+                }
+            }
+        break;
         default:
         break;
     }
