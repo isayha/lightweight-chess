@@ -59,6 +59,7 @@ static const int dirs[8][2] = {
 
 chessBoard getNewChessBoard();
 void printChessBoard(chessBoard, int);
+coordsNode* appendMove(coordsNode*, coords);
 coordsNode* getMoves(chessBoard, coords);
 
 #endif
