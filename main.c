@@ -82,4 +82,18 @@ void main(int argc, char *argv[]) {
     headNode = getMoves(board, testCoords);
     printAllNodes(headNode);
     freeAllNodes(headNode);
+
+    printf("\nKING WHITE:");
+
+    testCoords.row = 0; testCoords.col = 4;
+    headNode = getMoves(board, testCoords);
+    printAllNodes(headNode);
+    freeAllNodes(headNode);
+
+    printf("\nKING BLACK:");
+
+    testCoords.row = 7; testCoords.col = 4;
+    headNode = getMoves(board, testCoords);
+    printAllNodes(headNode);
+    freeAllNodes(headNode);
 }

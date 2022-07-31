@@ -140,8 +140,11 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
                     otherPiece = board.spaces[newRow][newCol];
                     if (otherPiece == 0 || (piece / 7 != otherPiece / 7)) {
                         coords move = {newRow, newCol};
+                        if (piece == whiteKing || piece == blackKing) {
+                            // Add king vulnerability check (recursive call) here
+                        }
                         currentNode = appendMove(currentNode, move);
-                        if (otherPiece != 0) {
+                        if (otherPiece != 0 || (piece == whiteKing || piece == blackKing)) {
                             break;
                         }
                     }
