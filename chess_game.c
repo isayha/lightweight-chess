@@ -161,3 +161,22 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
     }
     return headNode;
 }
+
+metaCoordsNode* getAllMoves(chessBoard board, int turn) {
+    metaCoordsNode* headMCNode = createNewMCNode(NULL);
+    metaCoordsNode* currentMCNode = headMCNode;
+
+    for (int row = 7; row >= 0; row--) {
+        for (int col = 0; col <= 7; col++) {
+            int piece = board.spaces[row][col];
+            if (piece > 0 && 1 + ((piece / 6) * -2) == turn) {
+                coords pieceCoords = {row, col};
+                coordsNode* moves = getMoves(board, pieceCoords);
+                metaCoordsNode* newMCNode = createNewMCNode(moves);
+                currentMCNode->nextMCNode = newMCNode;
+                currentMCNode = newMCNode;
+            }
+        }
+    }
+    return headMCNode;
+}

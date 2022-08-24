@@ -61,5 +61,6 @@ chessBoard getNewChessBoard();
 void printChessBoard(chessBoard, int);
 coordsNode* appendMove(coordsNode*, coords);
 coordsNode* getMoves(chessBoard, coords);
+metaCoordsNode* getAllMoves(chessBoard, int);
 
 #endif
