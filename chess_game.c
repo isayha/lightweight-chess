@@ -31,6 +31,12 @@ void printChessBoard(chessBoard board, int turn) {
     }
 }
 
+coordsNode* appendMove(coordsNode* currentNode, coords move) {
+    coordsNode* newNode = createNewNode(move);
+    currentNode->nextNode = newNode;
+    return newNode;
+}
+
 coordsNode* getMoves(chessBoard board, coords pieceCoords) {
     // Move list setup
     coordsNode* headNode = createNewNode(pieceCoords);
@@ -40,6 +46,7 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
     int row = pieceCoords.row;
     int col = pieceCoords.col;
     int piece = board.spaces[row][col];
+
     if (piece == none) {
         return NULL; // NOTE: Originally returned the identity move (headNode)
     }
@@ -53,48 +60,54 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
     }
 
     switch (piece) {
+        int newRow;
+        int newCol;
+        int otherPiece;
+
         case whitePawn: case blackPawn:
             // Diagonal (capture) check
+            newRow = row + (1 * turn);
             for (int colInc = -1; colInc <= 1; colInc += 2) {
-                int newCol = col + colInc;
+                newCol = col + colInc;
                 if (newCol < 0 || newCol > 7) {
                     continue;
                 }
-                int otherPiece = board.spaces[row + (1 * turn)][newCol];
-                if (otherPiece != 0 && (piece / 7 != otherPiece / 7)) {
-                    coords move = {row + (1 * turn), newCol};
-                    coordsNode* newNode = createNewNode(move);
-                    currentNode->nextNode = newNode;
-                    currentNode = newNode;
+                
+                otherPiece = board.spaces[newRow][newCol];
+                if (otherPiece != none && (piece / 7 != otherPiece / 7)) {
+                    coords move = {newRow, newCol};
+                    currentNode = appendMove(currentNode, move);
                 }
+                
                 // NOTE: Add En Passant logic here
             }
             // Forward check
-            if (board.spaces[row + (1 * turn)][col] == none) {
-                coords move = {row + (1 * turn), col};
-                coordsNode* newNode = createNewNode(move);
-                currentNode->nextNode = newNode;
-                currentNode = newNode;
+            
+            otherPiece = board.spaces[newRow][col];
+            if (otherPiece == none) {
+                coords move = {newRow, col};
+                currentNode = appendMove(currentNode, move);
+                
                 // Double forward check
-                if (row == (1 + (5 * (piece / 7))) && board.spaces[row + (2 * turn)][col] == none) {
-                    coords move = {row + (2 * turn), col};
-                    coordsNode* newNode = createNewNode(move);
-                    currentNode->nextNode = newNode;
-                    currentNode = newNode;
+                newRow = row + (2 * turn);
+                
+                otherPiece = board.spaces[newRow][col];
+                if (otherPiece == none && row == (1 + (5 * (piece / 7)))) {
+                    coords move = {newRow, col};
+                    currentNode = appendMove(currentNode, move);
                 }
+                
             }
         break;
         case whiteKnight: case blackKnight:
             for (int i = 0; i < 8; i++) {
-                int newRow = row + knightMoves[i][0];
-                int newCol = col + knightMoves[i][1];
+                newRow = row + knightMoves[i][0];
+                newCol = col + knightMoves[i][1];
                 if ((newRow >= 0 && newRow < 8) && (newCol >= 0 && newCol < 8)) {
-                    int otherPiece = board.spaces[newRow][newCol];
+                    otherPiece = board.spaces[newRow][newCol];
                     if (otherPiece == 0 || (piece / 7 != otherPiece / 7)) {
                         coords move = {newRow, newCol};
-                        coordsNode* newNode = createNewNode(move);
-                        currentNode->nextNode = newNode;
-                        currentNode = newNode;
+                        currentNode = appendMove(currentNode, move);
                     }
                 }
             }
@@ -103,40 +116,40 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
         case whiteRook: case blackRook:
         case whiteQueen: case blackQueen:
         case whiteKing: case blackKing:
-            int i_start;
-            int i_end;
+            int startIndex;
+            int endIndex;
 
             if (piece != whiteRook && piece != blackRook) {
-                i_start = 0;
+                startIndex = 0;
             }
             else {
-                i_start = 4;
+                startIndex = 4;
             }
 
             if (piece != whiteBishop && piece != blackBishop) {
-                i_end = 8;
+                endIndex = 8;
             }
             else {
-                i_end = 4;
+                endIndex = 4;
             }
 
-            for (int i = i_start; i < i_end; i++) {
-                int newRow = row + dirs[i][0];
-                int newCol = col + dirs[i][1];
-                int endFlag = 0;
-                while (!endFlag && (newRow >= 0 && newRow < 8) && (newCol >= 0 && newCol < 8)) {
-                    int otherPiece = board.spaces[newRow][newCol];
+            for (int i = startIndex; i < endIndex; i++) {
+                newRow = row + dirs[i][0];
+                newCol = col + dirs[i][1];
+                while ((newRow >= 0 && newRow < 8) && (newCol >= 0 && newCol < 8)) {
+                    otherPiece = board.spaces[newRow][newCol];
                     if (otherPiece == 0 || (piece / 7 != otherPiece / 7)) {
                         coords move = {newRow, newCol};
-                        coordsNode* newNode = createNewNode(move);
-                        currentNode->nextNode = newNode;
-                        currentNode = newNode;
-                        if (otherPiece != 0) {
-                            endFlag = 1;
+                        if (piece == whiteKing || piece == blackKing) {
+                            // Add king vulnerability check (recursive call) here
+                        }
+                        currentNode = appendMove(currentNode, move);
+                        if (otherPiece != 0 || (piece == whiteKing || piece == blackKing)) {
+                            break;
                         }
                     }
                     else {
-                        endFlag = 1;
+                        break;
                     }
                     newRow += dirs[i][0];
                     newCol += dirs[i][1];
@@ -147,4 +160,28 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
         break;
     }
     return headNode;
+}
+
+metaCoordsNode* getAllMoves(chessBoard board, int turn) {
+    metaCoordsNode* headMCNode = createNewMCNode(NULL);
+    metaCoordsNode* currentMCNode = headMCNode;
+
+    for (int row = 7; row >= 0; row--) {
+        for (int col = 0; col <= 7; col++) {
+            int piece = board.spaces[row][col];
+            if (piece > 0 && 1 + ((piece / 6) * -2) == turn) {
+                coords pieceCoords = {row, col};
+                coordsNode* moves = getMoves(board, pieceCoords);
+                if (moves->nextNode) { // If the movelist does not solely contain the identity move (i.e. if at least one move exists)...
+                    // Somehow this minor memory optimization solves what appears to be a print buffer issue.
+                    // Calling this function and then subsequently printing the results via printAllMoves for both players in sequence
+                    // seems to break without an explicit error.
+                    metaCoordsNode* newMCNode = createNewMCNode(moves);
+                    currentMCNode->nextMCNode = newMCNode;
+                    currentMCNode = newMCNode;
+                }
+            }
+        }
+    }
+    return headMCNode;
 }

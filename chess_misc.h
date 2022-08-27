@@ -21,4 +21,13 @@ coordsNode* createNewNode(coords);
 void freeAllNodes(coordsNode*);
 void printAllNodes(coordsNode*);
 
+typedef struct metaCoordsNode {
+    coordsNode* data;
+    struct metaCoordsNode* nextMCNode;
+} metaCoordsNode;
+
+metaCoordsNode* createNewMCNode(coordsNode*);
+void freeAllMCNodes(metaCoordsNode*);
+void printAllMCNodes(metaCoordsNode*);
+
 #endif
