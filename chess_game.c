@@ -31,6 +31,7 @@ void printChessBoard(chessBoard board, int turn) {
     }
 }
 
+// It may be worth moving appendMove into chess_misc and renaming it to appendNode/renaming "move" to "coord", etc.
 coordsNode* appendMove(coordsNode* currentNode, coords move) {
     coordsNode* newNode = createNewNode(move);
     currentNode->nextNode = newNode;
@@ -48,22 +49,24 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
     int piece = board.spaces[row][col];
 
     if (piece == none) {
-        return NULL; // NOTE: Originally returned the identity move (headNode)
+        return NULL;
     }
 
+    // Turn indicator setup
+    // TODO: This may be need to be removed, as it has been made somewhat redundant by getAllMoves
     int turn;
-    if (piece > 6) { // NOTE: Consider removing hardcoding/creating a static const variable pieceTypeCount
+    if (piece > 6) { // TODO: Consider removing hardcoding/creating a static const variable pieceTypeCount
         turn = -1; // turn = -1 <=> Black turn
     }
     else {
         turn = 1; // turn = 1 <=> White turn
     }
 
+    // Move search logic
     switch (piece) {
         int newRow;
         int newCol;
         int otherPiece;
-
         case whitePawn: case blackPawn:
             // Diagonal (capture) check
             newRow = row + (1 * turn);
@@ -79,10 +82,9 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
                     currentNode = appendMove(currentNode, move);
                 }
                 
-                // NOTE: Add En Passant logic here
+                // TODO: Add En Passant logic here
             }
             // Forward check
-            
             otherPiece = board.spaces[newRow][col];
             if (otherPiece == none) {
                 coords move = {newRow, col};
@@ -90,13 +92,12 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
                 
                 // Double forward check
                 newRow = row + (2 * turn);
-                
+
                 otherPiece = board.spaces[newRow][col];
                 if (otherPiece == none && row == (1 + (5 * (piece / 7)))) {
                     coords move = {newRow, col};
                     currentNode = appendMove(currentNode, move);
                 }
-                
             }
         break;
         case whiteKnight: case blackKnight:
@@ -141,7 +142,7 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
                     if (otherPiece == 0 || (piece / 7 != otherPiece / 7)) {
                         coords move = {newRow, newCol};
                         if (piece == whiteKing || piece == blackKing) {
-                            // Add king vulnerability check (recursive call) here
+                            // TODO: Add king vulnerability check (recursive call) here
                         }
                         currentNode = appendMove(currentNode, move);
                         if (otherPiece != 0 || (piece == whiteKing || piece == blackKing)) {
@@ -172,7 +173,7 @@ metaCoordsNode* getAllMoves(chessBoard board, int turn) {
             if (piece > 0 && 1 + ((piece / 6) * -2) == turn) {
                 coords pieceCoords = {row, col};
                 coordsNode* moves = getMoves(board, pieceCoords);
-                if (moves->nextNode) { // If the movelist does not solely contain the identity move (i.e. if at least one move exists)...
+                if (moves && moves->nextNode) { // If the movelist does not solely contain the identity move (i.e. if at least one move exists)...
                     // Somehow this minor memory optimization solves what appears to be a print buffer issue.
                     // Calling this function and then subsequently printing the results via printAllMoves for both players in sequence
                     // seems to break without an explicit error.
@@ -184,4 +185,35 @@ metaCoordsNode* getAllMoves(chessBoard board, int turn) {
         }
     }
     return headMCNode;
+}
+
+int getScore(chessBoard board, int turn) {
+    int score = 0;
+    for (int row = 7; row >= 0; row--) {
+        for (int col = 0; col <= 7; col++) {
+            int piece = board.spaces[row][col];
+            if (piece > 0 && 1 + ((piece / 6) * -2) == turn) {
+                // TODO: Consider using an array (piece as index)
+                // or a hashmap instead of a switch
+                switch (piece) {
+                    case whitePawn: case blackPawn:
+                        score += 1;
+                    break;
+                    case whiteKnight: case blackKnight: case whiteBishop: case blackBishop:
+                        score += 3;
+                    break;
+                    case whiteRook: case blackRook:
+                        score += 5;
+                    break;
+                    case whiteQueen: case blackQueen:
+                        score += 9;
+                    break;
+                    // TODO: Add king value (?)
+                    default:
+                    break;
+                }
+            }
+        }
+    }
+    return score;
 }

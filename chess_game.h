@@ -63,4 +63,6 @@ coordsNode* appendMove(coordsNode*, coords);
 coordsNode* getMoves(chessBoard, coords);
 metaCoordsNode* getAllMoves(chessBoard, int);
 
+int getScore(chessBoard, int);
+
 #endif

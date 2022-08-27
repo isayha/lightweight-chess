@@ -7,11 +7,6 @@ coordsNode* createNewNode(coords data) {
     return newNode;
 }
 
-// Unused
-// void appendNode(coordsNode* headNode, coordsNode* tailNode) {
-//     headNode->nextNode = tailNode;
-// }
-
 void freeAllNodes(coordsNode* headNode) {
     coordsNode* currentNode = headNode;
     while (currentNode) {
@@ -50,10 +45,13 @@ void freeAllMCNodes(metaCoordsNode* headMCNode) {
 }
 
 void printAllMCNodes(metaCoordsNode* headMCNode) {
-    metaCoordsNode* currentMCNode = headMCNode->nextMCNode;
-    while (currentMCNode) {
-        coordsNode* data = currentMCNode->data;
-        printAllNodes(data->nextNode);
-        currentMCNode = currentMCNode->nextMCNode;
+    if (headMCNode) { // Should prevent undefined behaviour
+    metaCoordsNode* currentMCNode = headMCNode->nextMCNode; // The headMCNode's data is always NULL
+        while (currentMCNode) {
+            coordsNode* data = currentMCNode->data;
+            printAllNodes(data->nextNode); // Skips the headNode as it contains the identity move (when a linked list of coordsNodes is used to hold chess moves)
+            // This may need to be changed as this makes the function non-generic and its name misleading
+            currentMCNode = currentMCNode->nextMCNode;
+        }
     }
 }

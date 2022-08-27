@@ -1,7 +1,6 @@
 #include "chess_game.h"
 
-void testGetMoves() {
-    chessBoard board = getNewChessBoard();
+void testGetMoves(chessBoard board) {
     printChessBoard(board, whiteTurn);
     printf("\n");
     printChessBoard(board, blackTurn);
@@ -98,17 +97,18 @@ void testGetMoves() {
     freeAllNodes(headNode);
 }
 
-void main(int argc, char *argv[]) {
-    chessBoard board = getNewChessBoard();
-
-
+void testGetAllMoves(chessBoard board) {
     printf("\nALL MOVES WHITE:");
     metaCoordsNode* headMCNode = getAllMoves(board, 1);
     printAllMCNodes(headMCNode);
     freeAllMCNodes(headMCNode);
 
     printf("\n\nALL MOVES BLACK:");
-    metaCoordsNode* headMCNode2 = getAllMoves(board, -1);
-    printAllMCNodes(headMCNode2);
-    freeAllMCNodes(headMCNode2);
+    headMCNode = getAllMoves(board, -1);
+    printAllMCNodes(headMCNode);
+    freeAllMCNodes(headMCNode);
+}
+
+void main(int argc, char *argv[]) {
+    chessBoard board = getNewChessBoard();
 }
