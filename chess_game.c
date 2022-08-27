@@ -172,9 +172,14 @@ metaCoordsNode* getAllMoves(chessBoard board, int turn) {
             if (piece > 0 && 1 + ((piece / 6) * -2) == turn) {
                 coords pieceCoords = {row, col};
                 coordsNode* moves = getMoves(board, pieceCoords);
-                metaCoordsNode* newMCNode = createNewMCNode(moves);
-                currentMCNode->nextMCNode = newMCNode;
-                currentMCNode = newMCNode;
+                if (moves->nextNode) { // If the movelist does not solely contain the identity move (i.e. if at least one move exists)...
+                    // Somehow this minor memory optimization solves what appears to be a print buffer issue.
+                    // Calling this function and then subsequently printing the results via printAllMoves for both players in sequence
+                    // seems to break without an explicit error.
+                    metaCoordsNode* newMCNode = createNewMCNode(moves);
+                    currentMCNode->nextMCNode = newMCNode;
+                    currentMCNode = newMCNode;
+                }
             }
         }
     }

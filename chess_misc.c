@@ -42,7 +42,7 @@ void freeAllMCNodes(metaCoordsNode* headMCNode) {
         metaCoordsNode* prevMCNode = currentMCNode;
         currentMCNode = currentMCNode->nextMCNode;
 
-        coordsNode* data = currentMCNode->data;
+        coordsNode* data = prevMCNode->data;
         freeAllNodes(data);
 
         free(prevMCNode);
