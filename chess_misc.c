@@ -7,6 +7,12 @@ coordsNode* createNewNode(coords data) {
     return newNode;
 }
 
+coordsNode* appendNode(coordsNode* currentNode, coords move) {
+    coordsNode* newNode = createNewNode(move);
+    currentNode->nextNode = newNode;
+    return newNode;
+}
+
 void freeAllNodes(coordsNode* headNode) {
     coordsNode* currentNode = headNode;
     while (currentNode) {

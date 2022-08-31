@@ -10,7 +10,7 @@ chessBoard getNewChessBoard() {
             {none, none, none, none, none, none, none, none},
             {blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn},
             {blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackBishop, blackKnight, blackRook}
-        }
+        }, 0, whiteTurn
     };
     return newBoard;
 }
@@ -31,72 +31,48 @@ void printChessBoard(chessBoard board, int turn) {
     }
 }
 
-// It may be worth moving appendMove into chess_misc and renaming it to appendNode/renaming "move" to "coord", etc.
-coordsNode* appendMove(coordsNode* currentNode, coords move) {
-    coordsNode* newNode = createNewNode(move);
-    currentNode->nextNode = newNode;
-    return newNode;
-}
-
 coordsNode* getMoves(chessBoard board, coords pieceCoords) {
-    // Move list setup
-    coordsNode* headNode = createNewNode(pieceCoords);
-    coordsNode* currentNode = headNode;
-
-    // Variable setup
     int row = pieceCoords.row;
     int col = pieceCoords.col;
     int piece = board.spaces[row][col];
-
-    if (piece == none) {
+    int turn = board.turn;
+    if (piece == none || turn != 1 + ((piece / (pieceTypeCount / 2)) * -2)) {
         return NULL;
     }
 
-    // Turn indicator setup
-    // TODO: This may be need to be removed, as it has been made somewhat redundant by getAllMoves
-    int turn;
-    if (piece > 6) { // TODO: Consider removing hardcoding/creating a static const variable pieceTypeCount
-        turn = -1; // turn = -1 <=> Black turn
-    }
-    else {
-        turn = 1; // turn = 1 <=> White turn
-    }
+    coordsNode* headNode = createNewNode(pieceCoords);
+    coordsNode* currentNode = headNode;
 
-    // Move search logic
     switch (piece) {
         int newRow;
         int newCol;
         int otherPiece;
         case whitePawn: case blackPawn:
-            // Diagonal (capture) check
+            // Diagonal (capture) check:
             newRow = row + (1 * turn);
             for (int colInc = -1; colInc <= 1; colInc += 2) {
                 newCol = col + colInc;
                 if (newCol < 0 || newCol > 7) {
                     continue;
                 }
-                
                 otherPiece = board.spaces[newRow][newCol];
-                if (otherPiece != none && (piece / 7 != otherPiece / 7)) {
+                if (otherPiece != none && (piece / (pieceTypeCount + 1) != otherPiece / (pieceTypeCount + 1))) {
                     coords move = {newRow, newCol};
-                    currentNode = appendMove(currentNode, move);
+                    currentNode = appendNode(currentNode, move);
                 }
-                
-                // TODO: Add En Passant logic here
+                // TODO: Add En Passant logic
             }
-            // Forward check
+            // Forward check:
             otherPiece = board.spaces[newRow][col];
             if (otherPiece == none) {
                 coords move = {newRow, col};
-                currentNode = appendMove(currentNode, move);
-                
-                // Double forward check
+                currentNode = appendNode(currentNode, move);
+                // Double forward check:
                 newRow = row + (2 * turn);
-
                 otherPiece = board.spaces[newRow][col];
                 if (otherPiece == none && row == (1 + (5 * (piece / 7)))) {
                     coords move = {newRow, col};
-                    currentNode = appendMove(currentNode, move);
+                    currentNode = appendNode(currentNode, move);
                 }
             }
         break;
@@ -106,9 +82,9 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
                 newCol = col + knightMoves[i][1];
                 if ((newRow >= 0 && newRow < 8) && (newCol >= 0 && newCol < 8)) {
                     otherPiece = board.spaces[newRow][newCol];
-                    if (otherPiece == 0 || (piece / 7 != otherPiece / 7)) {
+                    if (otherPiece == none || (piece / 7 != otherPiece / 7)) {
                         coords move = {newRow, newCol};
-                        currentNode = appendMove(currentNode, move);
+                        currentNode = appendNode(currentNode, move);
                     }
                 }
             }
@@ -119,35 +95,29 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
         case whiteKing: case blackKing:
             int startIndex;
             int endIndex;
-
             if (piece != whiteRook && piece != blackRook) {
                 startIndex = 0;
             }
             else {
                 startIndex = 4;
             }
-
             if (piece != whiteBishop && piece != blackBishop) {
                 endIndex = 8;
             }
             else {
                 endIndex = 4;
             }
-
             for (int i = startIndex; i < endIndex; i++) {
                 newRow = row + dirs[i][0];
                 newCol = col + dirs[i][1];
                 while ((newRow >= 0 && newRow < 8) && (newCol >= 0 && newCol < 8)) {
                     otherPiece = board.spaces[newRow][newCol];
-                    if (otherPiece == 0 || (piece / 7 != otherPiece / 7)) {
+                    if (otherPiece == none || (piece / 7 != otherPiece / 7)) {
                         coords move = {newRow, newCol};
                         if (piece == whiteKing || piece == blackKing) {
                             // TODO: Add king vulnerability check (recursive call) here
                         }
-                        currentNode = appendMove(currentNode, move);
-                        if (otherPiece != 0 || (piece == whiteKing || piece == blackKing)) {
-                            break;
-                        }
+                        currentNode = appendNode(currentNode, move);
                     }
                     else {
                         break;
@@ -163,14 +133,16 @@ coordsNode* getMoves(chessBoard board, coords pieceCoords) {
     return headNode;
 }
 
-metaCoordsNode* getAllMoves(chessBoard board, int turn) {
+metaCoordsNode* getAllMoves(chessBoard board) {
+    int turn = board.turn;
+
     metaCoordsNode* headMCNode = createNewMCNode(NULL);
     metaCoordsNode* currentMCNode = headMCNode;
 
     for (int row = 7; row >= 0; row--) {
         for (int col = 0; col <= 7; col++) {
             int piece = board.spaces[row][col];
-            if (piece > 0 && 1 + ((piece / 6) * -2) == turn) {
+            if (piece != none && turn != 1 + ((piece / (pieceTypeCount / 2)) * -2)) {
                 coords pieceCoords = {row, col};
                 coordsNode* moves = getMoves(board, pieceCoords);
                 if (moves && moves->nextNode) { // If the movelist does not solely contain the identity move (i.e. if at least one move exists)...
@@ -187,33 +159,58 @@ metaCoordsNode* getAllMoves(chessBoard board, int turn) {
     return headMCNode;
 }
 
-int getScore(chessBoard board, int turn) {
+int getScoreManual(chessBoard board) {
     int score = 0;
     for (int row = 7; row >= 0; row--) {
         for (int col = 0; col <= 7; col++) {
             int piece = board.spaces[row][col];
-            if (piece > 0 && 1 + ((piece / 6) * -2) == turn) {
-                // TODO: Consider using an array (piece as index)
-                // or a hashmap instead of a switch
-                switch (piece) {
-                    case whitePawn: case blackPawn:
-                        score += 1;
-                    break;
-                    case whiteKnight: case blackKnight: case whiteBishop: case blackBishop:
-                        score += 3;
-                    break;
-                    case whiteRook: case blackRook:
-                        score += 5;
-                    break;
-                    case whiteQueen: case blackQueen:
-                        score += 9;
-                    break;
-                    // TODO: Add king value (?)
-                    default:
-                    break;
-                }
+            if (piece != none) {
+                score += pieceValues[piece];
             }
         }
     }
     return score;
+}
+
+void makeMove(chessBoard board, coordsTuple proposedMove, int verifyFlag) {
+    coords proposedOrigin = proposedMove.origin;
+    coords proposedDest = proposedMove.dest;
+
+    int verified = 0;
+    if (verifyFlag) {
+        coordsNode* legalDest = getMoves(board, proposedOrigin);
+        legalDest = legalDest->nextNode; // Skip the identity node
+        while (legalDest) {
+            if (legalDest->data.row == proposedDest.row && legalDest->data.col == proposedDest.col) {
+                verified = 1;
+                break;
+            }
+        }
+    }
+    else {
+        verified = 1;
+    }
+
+    if (verified) {
+        int piece = board.spaces[proposedOrigin.row][proposedOrigin.col];
+        int otherPiece = board.spaces[proposedDest.row][proposedDest.col];
+
+        board.spaces[proposedOrigin.row][proposedOrigin.col] = none;
+        board.spaces[proposedDest.row][proposedDest.col] = piece;
+
+        board.score = board.score - pieceValues[otherPiece];
+    }
+}
+
+int algColToBoardCol(char algCol) {
+    return ((int) algCol) - ((int) 'a');
+}
+
+int algRowToBoardRow(int algRow) {
+    return algRow + 1;
+}
+
+coordsTuple algNoteToMove(char* algNote) {
+    char charIndex = 0;
+    
 }

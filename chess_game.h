@@ -7,6 +7,8 @@
 
 typedef struct chessBoard {
     int spaces[8][8];
+    int score;
+    int turn; // TODO: Use internal board turn variable instead of passing turn variable separately
 } chessBoard;
 
 enum chessPiece {
@@ -18,6 +20,14 @@ enum chessPiece {
 enum turn {
     blackTurn = -1,
     whiteTurn = 1
+};
+
+static const int pieceTypeCount = 12;
+
+static const int pieceValues[13] = {
+    0,
+    1, 3, 3, 5, 9, 0,
+    -1, -3, -3, -5, -9, 0
 };
 
 static const char pieceStrs[13][3] = {
@@ -38,12 +48,12 @@ static const int knightMoves[8][2] = {
 };
 
 static const int dirs[8][2] = {
-    //BISHOP
+    // BISHOP
     {1, 1},
     {1, -1},
     {-1, 1},
     {-1, -1},
-    //ROOK
+    // ROOK
     {0, -1},
     {-1, 0},
     {0, 1},
@@ -59,10 +69,16 @@ static const int dirs[8][2] = {
 
 chessBoard getNewChessBoard();
 void printChessBoard(chessBoard, int);
-coordsNode* appendMove(coordsNode*, coords);
 coordsNode* getMoves(chessBoard, coords);
-metaCoordsNode* getAllMoves(chessBoard, int);
+metaCoordsNode* getAllMoves(chessBoard);
 
-int getScore(chessBoard, int);
+int getScoreManual(chessBoard);
+
+void makeMove(chessBoard, coordsTuple, int);
+
+int algColToBoardCol(char);
+int algRowToBoardRow(int);
+
+coordsTuple algNoteToMove(char*);
 
 #endif
