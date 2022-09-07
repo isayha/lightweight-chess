@@ -22,7 +22,7 @@ enum turn {
     whiteTurn = 1
 };
 
-static const int pieceTypeCount = 12;
+static const int pieceCutoff = 7;
 
 static const int pieceValues[13] = {
     0,
@@ -31,7 +31,7 @@ static const int pieceValues[13] = {
 };
 
 static const char pieceStrs[13][3] = {
-    {'X', 'X', '\0'},
+    {'-', '-', '\0'},
     {'W', 'P', '\0'}, {'W', 'N', '\0'}, {'W', 'B', '\0'}, {'W', 'R', '\0'}, {'W', 'Q', '\0'}, {'W', 'K', '\0'},
     {'B', 'P', '\0'}, {'B', 'N', '\0'}, {'B', 'B', '\0'}, {'B', 'R', '\0'}, {'B', 'Q', '\0'}, {'B', 'K', '\0'}
 };
@@ -61,24 +61,28 @@ static const int dirs[8][2] = {
 };
 
 // Using the Unicode chess pieces will require some tomfoolery
-// static char pieceStrsAdv[13][2] = {
+// static char* pieceStrsFancy[13][5] = {
 //     "☐",
 //     "♙", "♘", "♗", "♖", "♕", "♔",
 //     "♟" , "♞", "♝", "♜", "♛", "♚"
 // };
 
 chessBoard getNewChessBoard();
-void printChessBoard(chessBoard, int);
+void printChessBoard(chessBoard);
+void printChessBoardFancy(chessBoard);
 coordsNode* getMoves(chessBoard, coords);
 metaCoordsNode* getAllMoves(chessBoard);
 
 int getScoreManual(chessBoard);
 
-void makeMove(chessBoard, coordsTuple, int);
+chessBoard makeMove(chessBoard, coordsTuple, int);
 
-int algColToBoardCol(char);
-int algRowToBoardRow(int);
+int isFile(char);
+int isRank(char);
+int fileToBoardCol(char);
+int rankToBoardRow(char);
 
+coordsTuple simpleNoteToMove(char*);
 coordsTuple algNoteToMove(char*);
 
 #endif
